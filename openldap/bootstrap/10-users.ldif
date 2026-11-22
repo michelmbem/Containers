@@ -1,0 +1,19 @@
+dn: uid=mike,ou=people,dc=addy,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+uid: mike
+cn: Mike
+sn: Mike
+userPassword: mike.1
+
+dn: uid=danny,ou=people,dc=addy,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+uid: danny
+cn: Danny
+sn: Danny
+userPassword: danny.1

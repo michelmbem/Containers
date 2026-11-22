@@ -1,0 +1,16 @@
+services:
+  activemq:
+    image: islandora/activemq:main
+    container_name: activemq
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:8161:8161"
+    environment:
+      ACTIVEMQ_PASSWORD: amqadm
+      ACTIVEMQ_WEB_ADMIN_PASSWORD: amqwebadm
+    volumes:
+      - activemq_data:/opt/activemq/data
+
+volumes:
+  activemq_data:

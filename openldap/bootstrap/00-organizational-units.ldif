@@ -1,0 +1,9 @@
+dn: ou=people,dc=addy,dc=org
+objectClass: top
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=addy,dc=org
+objectClass: top
+objectClass: organizationalUnit
+ou: groups

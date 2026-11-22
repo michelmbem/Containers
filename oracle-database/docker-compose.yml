@@ -1,0 +1,67 @@
+services:
+  oracle-free:
+    image: container-registry.oracle.com/database/free:latest
+    container_name: oracle-free
+    restart: unless-stopped
+    environment:
+      ORACLE_PWD: ${ORACLE_PWD:-oradmin}
+      FIELD_NOTES_PASSWORD: ${DBGATE_PASSWORD_ORACLE:-FieldNotes1}
+    ports:
+      - "127.0.0.1:1521:1521"
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+      - oracle_backup:/opt/oracle/backup
+      - ./scripts:/opt/oracle/scripts/startup:ro
+    healthcheck:
+      test: ["CMD", "/opt/oracle/healthcheck.sh"]
+      interval: 20s
+      timeout: 10s
+      retries: 20
+      start_period: 10m
+
+  install-samples:
+    build:
+      context: ./install-samples
+    image: oracle-install-samples:23.3
+    restart: "no"
+    depends_on:
+      oracle-free:
+        condition: service_healthy
+    environment:
+      ORACLE_HOST: oracle-free
+      ORACLE_PORT: 1521
+      ORACLE_SERVICE: FREEPDB1
+      ORACLE_USER: SYSTEM
+      ORACLE_PASSWORD: ${ORACLE_PWD:-oradmin}
+      SAMPLE_SCHEMA_PASSWORD: ${SAMPLE_SCHEMA_PASSWORD:-SamplePwd1}
+      DEFAULT_TABLESPACE: USERS
+    volumes:
+      - ./db-sample-schemas-23.3.zip:/input/db-sample-schemas-23.3.zip:ro
+      - sample_install_state:/var/lib/install-samples
+
+  dbgate:
+    image: dbgate/dbgate
+    container_name: dbgate-oracle
+    restart: unless-stopped
+    depends_on:
+      oracle-free:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3100:3000"
+    volumes:
+      - dbgate_data:/root/.dbgate
+    environment:
+      CONNECTIONS: oracle
+      LABEL_oracle: Oracle Database Free
+      SERVER_oracle: oracle-free
+      PORT_oracle: 1521
+      USER_oracle: ${DBGATE_USER_ORACLE:-FIELD_NOTES}
+      PASSWORD_oracle: ${DBGATE_PASSWORD_ORACLE:-FieldNotes1}
+      ENGINE_oracle: oracle@dbgate-plugin-oracle
+      NODE_OPTIONS: --openssl-legacy-provider
+
+volumes:
+  oracle_data:
+  oracle_backup:
+  dbgate_data:
+  sample_install_state:

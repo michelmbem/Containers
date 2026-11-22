@@ -1,0 +1,65 @@
+services:
+  sql-server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql-server
+    hostname: sql-server
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:-$$qlDb@min}
+    ports:
+      - "127.0.0.1:1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql/data
+      - mssql_log:/var/opt/mssql/log
+      - mssql_secrets:/var/opt/mssql/secrets
+      - ./samples:/samples:ro
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -b -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q \"SELECT 1\" -o /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+
+  install-samples:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: "no"
+    depends_on:
+      sql-server:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "/installer/install-samples.sh"]
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:-$$qlDb@min}
+    volumes:
+      - ./install-samples/install-samples.sh:/installer/install-samples.sh:ro
+      - ./samples:/samples:ro
+      - ./scripts:/scripts:ro
+
+  dbgate-mssql:
+    image: dbgate/dbgate
+    container_name: dbgate-mssql
+    restart: unless-stopped
+    depends_on:
+      sql-server:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3101:3000"
+    volumes:
+      - dbgate_mssql_data:/root/.dbgate
+    environment:
+      CONNECTIONS: mssql
+      LABEL_mssql: SQL Server
+      SERVER_mssql: sql-server
+      PORT_mssql: 1433
+      DATABASE_mssql: master
+      USER_mssql: sa
+      PASSWORD_mssql: ${MSSQL_SA_PASSWORD:-$$qlDb@min}
+      ENGINE_mssql: mssql@dbgate-plugin-mssql
+
+volumes:
+  mssql_data:
+  mssql_log:
+  mssql_secrets:
+  dbgate_mssql_data:

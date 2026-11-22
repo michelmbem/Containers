@@ -1,0 +1,48 @@
+services:
+  openldap:
+    image: ghcr.io/intechcore/openldap:latest
+    container_name: openldap
+    hostname: openldap
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:1389:389"
+      - "127.0.0.1:1636:636"
+    environment:
+      LDAP_ORGANISATION: Addy Organization
+      LDAP_DOMAIN: addy.org
+      LDAP_ADMIN_PASSWORD: ldapadm
+      LDAP_CONFIG_PASSWORD: ldapadm
+      LDAP_TLS: "true"
+      LDAP_TLS_VERIFY_CLIENT: never
+    volumes:
+      - openldap_config:/etc/ldap/slapd.d
+      - openldap_data:/var/lib/ldap
+      - ./bootstrap:/bootstrap:ro
+  ldap-account-manager:
+    image: ghcr.io/ldapaccountmanager/lam:latest
+    container_name: ldap-account-manager
+    restart: unless-stopped
+    depends_on:
+      openldap:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:80"
+    environment:
+      LAM_PASSWORD: lamadm
+      LAM_LANG: fr_FR
+      LDAP_SERVER: ldap://openldap:389
+      LDAP_DOMAIN: addy.org
+      LDAP_BASE_DN: dc=addy,dc=org
+      LDAP_USERS_DN: ou=people,dc=addy,dc=org
+      LDAP_GROUPS_DN: ou=groups,dc=addy,dc=org
+      LDAP_USER: cn=admin,dc=addy,dc=org
+      LAM_SKIP_PRECONFIGURE: "false"
+    volumes:
+      - lam_config:/var/lib/ldap-account-manager/config
+      - lam_main_config:/etc/ldap-account-manager
+
+volumes:
+  openldap_config:
+  openldap_data:
+  lam_config:
+  lam_main_config:

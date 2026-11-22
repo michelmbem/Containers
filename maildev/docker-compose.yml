@@ -1,0 +1,18 @@
+services:
+  maildev:
+    image: maildev/maildev:latest
+    container_name: maildev
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:1080:1080"
+      - "127.0.0.1:1025:1025"
+    environment:
+      MAILDEV_WEB_USER: admin
+      MAILDEV_WEB_PASS: admin
+      MAILDEV_MAIL_DIRECTORY: /home/node/mail
+      MAILDEV_MAX_EMAILS: 500
+    volumes:
+      - maildev_mail:/home/node/mail
+
+volumes:
+  maildev_mail:

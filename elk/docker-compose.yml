@@ -1,0 +1,83 @@
+services:
+  setup:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION:?Copy .env-template to .env and set STACK_VERSION}
+    container_name: elk-setup
+    restart: "no"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:?Set ELASTIC_PASSWORD in .env}
+      KIBANA_PASSWORD: ${KIBANA_PASSWORD:?Set KIBANA_PASSWORD in .env}
+    command:
+      - bash
+      - -c
+      - |
+        echo "Setting kibana_system password";
+        curl --fail --silent --show-error \
+          -X POST -u "elastic:$${ELASTIC_PASSWORD}" \
+          -H "Content-Type: application/json" \
+          "http://elasticsearch:9200/_security/user/kibana_system/_password" \
+          -d "{\"password\":\"$${KIBANA_PASSWORD}\"}";
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION:?Copy .env-template to .env and set STACK_VERSION}
+    container_name: elasticsearch
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9200:9200"
+    environment:
+      discovery.type: single-node
+      cluster.name: elasticsearch
+      bootstrap.memory_lock: "true"
+      # Local development only: HTTP is plaintext; port 9200 is loopback-bound.
+      xpack.security.http.ssl.enabled: "false"
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:?Set ELASTIC_PASSWORD in .env}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'curl --fail --silent -u "elastic:$${ELASTIC_PASSWORD}" "http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s" >/dev/null'
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 30s
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION:?Copy .env-template to .env and set STACK_VERSION}
+    container_name: kibana
+    restart: unless-stopped
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+    ports:
+      - "127.0.0.1:5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      ELASTICSEARCH_USERNAME: kibana_system
+      ELASTICSEARCH_PASSWORD: ${KIBANA_PASSWORD:?Set KIBANA_PASSWORD in .env}
+      TELEMETRY_ENABLED: "false"
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:${STACK_VERSION:?Copy .env-template to .env and set STACK_VERSION}
+    container_name: logstash
+    restart: unless-stopped
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+    ports:
+      - "127.0.0.1:5044:5044"
+    environment:
+      ELASTIC_HOSTS: http://elasticsearch:9200
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:?Set ELASTIC_PASSWORD in .env}
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+
+volumes:
+  elasticsearch_data:
