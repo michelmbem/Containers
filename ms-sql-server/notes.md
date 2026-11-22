@@ -1,10 +1,10 @@
 # Microsoft SQL Server sample database stack
 
-This group runs SQL Server 2022 Developer, a one-shot sample installer, and DbGate. Start with `docker compose up -d`, stop and retain database files with `docker compose stop`, or remove containers with `docker compose down`. Add `-v` to remove database and client state; add `--rmi all` to remove images (`docker compose down --rmi all -v` resets the group).
+This group runs SQL Server 2022 Developer, a one-shot volume permission fixer, a one-shot sample installer, and DbGate. Start with `docker compose up -d`, stop and retain database files with `docker compose stop`, or remove containers with `docker compose down`. Add `-v` to remove database and client state; add `--rmi all` to remove images (`docker compose down --rmi all -v` resets the group).
 
 ## SQL Server
 
-Microsoft's relational database server. The listener is `127.0.0.1:1433`; the `sa` password defaults to `$qlDb@min`. The service stores database, log, and secret files in separate Docker-managed volumes.
+Microsoft's relational database server. The listener is `127.0.0.1:1433`; the `sa` password defaults to `$qlDb@min`. The service stores database, log, and secret files in separate Docker-managed volumes. Before startup, `fix-volume-permissions` assigns those volumes to SQL Server's non-root UID (`10001:0`), which prevents `Access is denied` errors while SQL Server creates its system databases.
 
 - [Product and Docker deployment docs](https://learn.microsoft.com/en-us/sql/linux/sql-server-linux-docker-container-deployment?view=sql-server-ver16) · [Microsoft Container Registry](https://mcr.microsoft.com/en-us/product/mssql/server/about) · [GitHub](https://github.com/microsoft/mssql-docker)
 - Isolated example: `docker run -d --name sql-server -p 127.0.0.1:1433:1433 -e ACCEPT_EULA=Y -e MSSQL_PID=Developer -e MSSQL_SA_PASSWORD='$qlDb@min' -v mssql_data:/var/opt/mssql/data -v mssql_log:/var/opt/mssql/log -v mssql_secrets:/var/opt/mssql/secrets mcr.microsoft.com/mssql/server:2022-latest`

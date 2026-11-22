@@ -1,9 +1,22 @@
 services:
+  fix-volume-permissions:
+    image: alpine:latest
+    user: "0:0"
+    restart: "no"
+    command: ["sh", "-c", "chown -R 10001:0 /var/opt/mssql/data /var/opt/mssql/log /var/opt/mssql/secrets"]
+    volumes:
+      - mssql_data:/var/opt/mssql/data
+      - mssql_log:/var/opt/mssql/log
+      - mssql_secrets:/var/opt/mssql/secrets
+
   sql-server:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sql-server
     hostname: sql-server
     restart: unless-stopped
+    depends_on:
+      fix-volume-permissions:
+        condition: service_completed_successfully
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_PID: Developer
@@ -53,7 +66,6 @@ services:
       LABEL_mssql: SQL Server
       SERVER_mssql: sql-server
       PORT_mssql: 1433
-      DATABASE_mssql: master
       USER_mssql: sa
       PASSWORD_mssql: ${MSSQL_SA_PASSWORD:-$$qlDb@min}
       ENGINE_mssql: mssql@dbgate-plugin-mssql

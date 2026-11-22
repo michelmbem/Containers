@@ -11,9 +11,14 @@ fi
 
 sample_dir=/samples
 
-"${sqlcmd}" "${sql_args[@]}" -Q "IF DB_ID(N'Northwind') IS NULL CREATE DATABASE [Northwind]"
-"${sqlcmd}" "${sql_args[@]}" -d Northwind -i "${sample_dir}/instnwnd.sql"
-"${sqlcmd}" "${sql_args[@]}" -i "${sample_dir}/instpubs.sql"
+if ! "${sqlcmd}" "${sql_args[@]}" -h -1 -Q "SET NOCOUNT ON; SELECT IIF(DB_ID(N'Northwind') IS NULL, 0, 1)" | grep -qx '1'; then
+  "${sqlcmd}" "${sql_args[@]}" -Q "CREATE DATABASE [Northwind]"
+  "${sqlcmd}" "${sql_args[@]}" -d Northwind -i "${sample_dir}/instnwnd.sql"
+fi
+
+if ! "${sqlcmd}" "${sql_args[@]}" -h -1 -Q "SET NOCOUNT ON; SELECT IIF(DB_ID(N'pubs') IS NULL, 0, 1)" | grep -qx '1'; then
+  "${sqlcmd}" "${sql_args[@]}" -i "${sample_dir}/instpubs.sql"
+fi
 
 "${sqlcmd}" "${sql_args[@]}" -Q "IF DB_ID(N'AdventureWorks2022') IS NULL
 BEGIN
