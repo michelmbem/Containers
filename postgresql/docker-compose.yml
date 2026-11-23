@@ -33,6 +33,8 @@ services:
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
       DB_NAME: ${DB_NAME:-pagila}
       DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-sqladm}
+      PGADMIN_REPLACE_SERVERS_ON_STARTUP: "True"
     ports:
       - "127.0.0.1:5050:80"
     volumes:

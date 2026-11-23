@@ -12,8 +12,8 @@ PostgreSQL is an open-source relational database. The Compose configuration init
 
 ## pgAdmin
 
-pgAdmin is a web administration and query interface for PostgreSQL. Open `http://127.0.0.1:5050`; default login is `admin@local.org` / `admin`. It is configured to connect to the PostgreSQL server in this group.
+pgAdmin is a web administration and query interface for PostgreSQL. Open `http://127.0.0.1:5050`; default login is `admin@local.org` / `admin`. The `BookStore PostgreSQL` server is preloaded and its password file is generated inside the container from the same `DB_USER` and `DB_PASSWORD` settings used by PostgreSQL, with a wildcard database field so the credentials work for every database on this server (including `chinook`). Server definitions are refreshed on each start.
 
 - [Project and docs](https://www.pgadmin.org/docs/) · [Base Docker image](https://hub.docker.com/r/dpage/pgadmin4) · [GitHub](https://github.com/pgadmin-org/pgadmin4)
-- Isolated example: build the group's custom image with `docker build -t local-pgadmin ./pgadmin`, then run `docker run -d --name pgadmin --network postgresql_default -p 127.0.0.1:5050:80 -e PGADMIN_DEFAULT_EMAIL=admin@local.org -e PGADMIN_DEFAULT_PASSWORD=admin -e DB_NAME=pagila -e DB_USER=postgres -v pgadmin_data:/var/lib/pgadmin local-pgadmin`
-- Options: persistent volume `pgadmin_data:/var/lib/pgadmin`; port `80`; `PGADMIN_DEFAULT_EMAIL`, `PGADMIN_DEFAULT_PASSWORD`, `DB_NAME`, `DB_USER`. Requires PostgreSQL on the same network. The example password is for local development.
+- Isolated example: build the group's custom image with `docker build -t local-pgadmin ./pgadmin`, then run `docker run -d --name pgadmin --network postgresql_default -p 127.0.0.1:5050:80 -e PGADMIN_DEFAULT_EMAIL=admin@local.org -e PGADMIN_DEFAULT_PASSWORD=admin -e DB_NAME=pagila -e DB_USER=postgres -e DB_PASSWORD=sqladm -v pgadmin_data:/var/lib/pgadmin local-pgadmin`
+- Options: persistent volume `pgadmin_data:/var/lib/pgadmin`; port `80`; `PGADMIN_DEFAULT_EMAIL`, `PGADMIN_DEFAULT_PASSWORD`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`; `PGADMIN_REPLACE_SERVERS_ON_STARTUP`. Requires PostgreSQL on the same network. The example password is for local development.
