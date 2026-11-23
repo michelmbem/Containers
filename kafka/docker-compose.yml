@@ -19,9 +19,9 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
     volumes:
-      - kafka_data:/tmp/kraft-combined-logs
+      - kafka_data_v2:/var/lib/kafka/data
     healthcheck:
       test:
         - CMD-SHELL
@@ -45,4 +45,4 @@ services:
       KAFKA_CLUSTERS_0_NAME: local-kafka-cluster
 
 volumes:
-  kafka_data:
+  kafka_data_v2:

@@ -112,7 +112,7 @@ services:
       retries: 10
 
   db:
-    image: postgres:latest
+    image: postgres:17
     container_name: jasmin-web-db
     restart: unless-stopped
     environment:

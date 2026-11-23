@@ -1,0 +1,59 @@
+{
+  "realm": "example",
+  "enabled": true,
+  "displayName": "Example",
+  "roles": {
+    "realm": [
+      { "name": "user" },
+      { "name": "admin" }
+    ]
+  },
+  "users": [
+    {
+      "username": "mike",
+      "enabled": true,
+      "email": "mike@local.org",
+      "emailVerified": true,
+      "credentials": [
+        { "type": "password", "value": "mike.1", "temporary": false }
+      ],
+      "realmRoles": ["user"]
+    },
+    {
+      "username": "danny",
+      "enabled": true,
+      "email": "danny@local.org",
+      "emailVerified": true,
+      "credentials": [
+        { "type": "password", "value": "danny.1", "temporary": false }
+      ],
+      "realmRoles": ["admin"]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "inventory",
+      "name": "inventory",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "inventory-secret",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true
+    },
+    {
+      "clientId": "shop",
+      "name": "shop",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "shop-secret",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true
+    }
+  ]
+}
