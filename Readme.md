@@ -9,6 +9,7 @@ This repository is a collection of independent Docker Compose groups for trying 
 | Databases and data stores | [Db2](./db2/notes.md), [Firebird](./firebird/notes.md), [MariaDB](./mariadb/notes.md), [MongoDB](./mongodb/notes.md), [Microsoft SQL Server](./ms-sql-server/notes.md), [Oracle Database Free](./oracle-database/notes.md), [PostgreSQL](./postgresql/notes.md), [Redis](./redis/notes.md) |
 | Messaging and streaming | [ActiveMQ](./activemq/notes.md), [Jasmin SMPP](./jasmin/notes.md), [Kafka](./kafka/notes.md), [RabbitMQ](./rabbitmq/notes.md) |
 | Identity and directory services | [Keycloak](./keycloak/notes.md), [OpenLDAP](./openldap/notes.md) |
+| Secrets management | [HashiCorp Vault](./vault/notes.md) |
 | Development and diagnostics | [MailDev](./maildev/notes.md), [SonarQube](./sonarqube/notes.md), [Zipkin](./zipkin/notes.md), [Elastic Stack](./elk/notes.md) |
 
 Several groups include a web interface alongside the main service. Some database groups also include a one-shot service that initializes sample data when the database is ready.
@@ -39,11 +40,11 @@ extra_hosts:
   - "host.docker.internal:host-gateway"
 ```
 
-The SonarQube group uses this mapping to reach PostgreSQL running on the host. See Docker's [Compose networking guide](https://docs.docker.com/compose/how-tos/networking/).
+Compose networking can also connect a container to a host service when a group is configured that way. See Docker's [Compose networking guide](https://docs.docker.com/compose/how-tos/networking/).
 
 ### Networking and ports
 
-Services in the same Compose group can reach one another by service name on that group's default network (for example, `postgres:5432`). Use the published host address when connecting from a host application. Most published ports in this repository bind to `127.0.0.1` and are therefore intended for local access. PostgreSQL publishes port `5432` for host tools and the separate SonarQube group.
+Services in the same Compose group can reach one another by service name on that group's default network (for example, `postgres:5432`). Use the published host address when connecting from a host application. Most published ports in this repository bind to `127.0.0.1` and are therefore intended for local access. The global PostgreSQL group publishes port `5432` for host tools; SonarQube has a separate PostgreSQL service on its own Compose network.
 
 ### Credentials and persistence
 
