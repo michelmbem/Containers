@@ -25,10 +25,16 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@local.org}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json
+      PGADMIN_REPLACE_SERVERS_ON_STARTUP: "True"
+      PGPASS_FILE: /run/secrets/keycloak_pgpass
     ports:
       - "127.0.0.1:5051:80"
     volumes:
       - keycloak_pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+    secrets:
+      - keycloak_pgpass
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
@@ -56,3 +62,7 @@ volumes:
   keycloak_data:
   keycloak_postgres_data:
   keycloak_pgadmin_data:
+
+secrets:
+  keycloak_pgpass:
+    file: ./pgadmin/.pgpass

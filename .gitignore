@@ -21,6 +21,7 @@ $RECYCLE.BIN/
 .env-*
 !.env-template
 !.env.example
+keycloak/pgadmin/.pgpass
 
 # Logs and temporary files
 *.log
