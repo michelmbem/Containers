@@ -4,11 +4,11 @@ This group contains an OpenLDAP directory server, bootstrap entries, and LDAP Ac
 
 ## OpenLDAP
 
-OpenLDAP is an LDAP directory server. This group initializes the `addy.org` directory and sample accounts from `bootstrap/`. LDAP and LDAPS are published on loopback ports `1389` and `1636`; directory and server configuration persist in `openldap_data` and `openldap_config`.
+OpenLDAP is an LDAP directory server. This group initializes the `addy.org` directory, sample accounts, groups, and JPEG profile photos from `bootstrap/`. It includes `mike` (Michel Mbem, `mike@local.org`, photo `pictures/mike.jpg`) in `cn=users` and `danny` (Daniel Mbem, `danny@local.org`, photo `pictures/danny.jpg`) in `cn=administrators`. Photos are stored as each user's `jpegPhoto` attribute. LDAP and LDAPS are published on loopback ports `1389` and `1636`; directory and server configuration persist in `openldap_data` and `openldap_config`.
 
 - [Project](https://www.openldap.org/) · [GHCR image and documentation](https://github.com/intechcore/openldap) · [GitHub](https://github.com/openldap/openldap)
 - Isolated example: `docker run -d --name openldap -p 127.0.0.1:1389:389 -p 127.0.0.1:1636:636 -e LDAP_ORGANISATION='Addy Organization' -e LDAP_DOMAIN=addy.org -e LDAP_ADMIN_PASSWORD=ldapadm -e LDAP_CONFIG_PASSWORD=ldapadm -e LDAP_TLS=true -e LDAP_TLS_VERIFY_CLIENT=never -v openldap_config:/etc/ldap/slapd.d -v openldap_data:/var/lib/ldap -v "$PWD/bootstrap:/bootstrap:ro" ghcr.io/intechcore/openldap:latest`
-- Options: named volumes for LDAP config and directory; read-only `bootstrap/` mount; `LDAP_ORGANISATION`, `LDAP_DOMAIN`, `LDAP_ADMIN_PASSWORD`, `LDAP_CONFIG_PASSWORD`, `LDAP_TLS`, `LDAP_TLS_VERIFY_CLIENT`; LDAP ports `389`, `636`. Initial entries are applied to empty volumes.
+- Options: named volumes for LDAP config and directory; read-only `bootstrap/` mount; `LDAP_ORGANISATION`, `LDAP_DOMAIN`, `LDAP_ADMIN_PASSWORD`, `LDAP_CONFIG_PASSWORD`, `LDAP_TLS`, `LDAP_TLS_VERIFY_CLIENT`; LDAP ports `389`, `636`. Initial entries are applied only to empty volumes; edits to the LDIF files do not update an already initialized directory automatically.
 
 ## LDAP Account Manager
 

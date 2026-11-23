@@ -1,0 +1,11 @@
+dn: cn=users,ou=groups,dc=addy,dc=org
+objectClass: top
+objectClass: groupOfNames
+cn: users
+member: uid=mike,ou=people,dc=addy,dc=org
+
+dn: cn=administrators,ou=groups,dc=addy,dc=org
+objectClass: top
+objectClass: groupOfNames
+cn: administrators
+member: uid=danny,ou=people,dc=addy,dc=org

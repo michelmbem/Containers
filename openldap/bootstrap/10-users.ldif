@@ -4,8 +4,11 @@ objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
 uid: mike
-cn: Mike
-sn: Mike
+cn: Michel Mbem
+givenName: Michel
+sn: Mbem
+mail: mike@local.org
+jpegPhoto:< file:///bootstrap/pictures/mike.jpg
 userPassword: mike.1
 
 dn: uid=danny,ou=people,dc=addy,dc=org
@@ -14,6 +17,9 @@ objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
 uid: danny
-cn: Danny
-sn: Danny
+cn: Daniel Mbem
+givenName: Daniel
+sn: Mbem
+mail: danny@local.org
+jpegPhoto:< file:///bootstrap/pictures/danny.jpg
 userPassword: danny.1
