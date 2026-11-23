@@ -13,7 +13,12 @@ services:
       - oracle_backup:/opt/oracle/backup
       - ./scripts:/opt/oracle/scripts/startup:ro
     healthcheck:
-      test: ["CMD", "/opt/oracle/healthcheck.sh"]
+      test:
+        - CMD-SHELL
+        - >-
+          echo 'SELECT open_mode FROM v$$pdbs WHERE con_id = 3;' |
+          sqlplus -L -s / as sysdba |
+          grep -q "READ WRITE"
       interval: 20s
       timeout: 10s
       retries: 20
@@ -55,8 +60,9 @@ services:
       LABEL_oracle: Oracle Database Free
       SERVER_oracle: oracle-free
       PORT_oracle: 1521
-      USER_oracle: ${DBGATE_USER_ORACLE:-FIELD_NOTES}
-      PASSWORD_oracle: ${DBGATE_PASSWORD_ORACLE:-FieldNotes1}
+      SERVICE_NAME_oracle: FREEPDB1
+      USER_oracle: SYSTEM
+      PASSWORD_oracle: ${ORACLE_PWD:-oradmin}
       ENGINE_oracle: oracle@dbgate-plugin-oracle
       NODE_OPTIONS: --openssl-legacy-provider
 

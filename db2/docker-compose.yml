@@ -23,6 +23,9 @@ services:
       HADR_ENABLED: "false"
     volumes:
       - db2_data:/database
+      - db2_sample_state:/state
+      - ./scripts:/scripts:ro
+      - ./custom:/var/custom:ro
     healthcheck:
       test:
         - CMD-SHELL
@@ -32,24 +35,20 @@ services:
       retries: 30
       start_period: 5m
 
-  install-samples:
-    image: icr.io/db2_community/db2:latest
-    container_name: db2-install-samples
-    platform: linux/amd64
-    restart: "no"
+  cloudbeaver-db2:
+    image: dbeaver/cloudbeaver:latest
+    container_name: cloudbeaver-db2
+    restart: unless-stopped
     depends_on:
       db2:
         condition: service_healthy
-    entrypoint: ["/bin/bash", "/scripts/install-roastery.sh"]
-    environment:
-      LICENSE: accept
-      DB2INSTANCE: db2inst1
-      DB2INST1_PASSWORD: ${DB2INST1_PASSWORD:-Db2DevAdm1n!}
+    ports:
+      - "127.0.0.1:3103:8978"
     volumes:
-      - db2_data:/database
-      - ./scripts:/scripts:ro
-      - db2_sample_state:/state
+      - cloudbeaver_db2_data:/opt/cloudbeaver/workspace
+      - ./cloudbeaver/data-sources.json:/opt/cloudbeaver/workspace/GlobalConfiguration/.dbeaver/data-sources.json
 
 volumes:
   db2_data:
   db2_sample_state:
+  cloudbeaver_db2_data:

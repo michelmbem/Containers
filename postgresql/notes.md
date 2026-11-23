@@ -7,8 +7,8 @@ This group runs PostgreSQL and pgAdmin, with a sample database initialized from 
 PostgreSQL is an open-source relational database. The Compose configuration initializes database `pagila` with user `postgres` by default, and stores data in `postgres_data`. Port `5432` is published for local clients and for the separate SonarQube Compose group.
 
 - [Project and docs](https://www.postgresql.org/docs/) · [Docker Hub](https://hub.docker.com/_/postgres) · [GitHub](https://github.com/postgres/postgres)
-- Isolated example: `docker run -d --name postgres -p 5432:5432 -e POSTGRES_DB=pagila -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=sqladm -v postgres_data:/var/lib/postgresql/data -v "$PWD/scripts:/docker-entrypoint-initdb.d:ro" postgres:latest`
-- Options: persistent volume `postgres_data:/var/lib/postgresql/data`; read-only initialization scripts mount; `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`; host port `5432` (published for host clients and the SonarQube group). Initialization scripts run only for a new data volume.
+- Isolated example: `docker run -d --name postgres -p 5432:5432 -e POSTGRES_DB=pagila -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=sqladm -v postgres_data:/var/lib/postgresql -v "$PWD/scripts:/docker-entrypoint-initdb.d:ro" postgres:latest`
+- Options: persistent volume `postgres_data:/var/lib/postgresql`; read-only initialization scripts mount; `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`; host port `5432` (published for host clients and the SonarQube group). PostgreSQL 18+ stores the cluster in a version-specific subdirectory of `/var/lib/postgresql`; initialization scripts run only for a new data volume.
 
 ## pgAdmin
 

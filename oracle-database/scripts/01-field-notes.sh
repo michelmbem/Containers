@@ -139,6 +139,78 @@ WHEN NOT MATCHED THEN INSERT
     src.field_note
   );
 
+MERGE INTO sites target
+USING (
+  SELECT 'COAST-04' site_code, 'Seal Rock' site_name, 'Pacific Coast' region, 48.39000 latitude, -123.41000 longitude FROM dual
+  UNION ALL
+  SELECT 'FOREST-05', 'Mossy Creek', 'Coastal Forest', 48.47000, -123.48000 FROM dual
+  UNION ALL
+  SELECT 'WETLAND-06', 'Reedbed Lagoon', 'South Island Wetlands', 48.33000, -123.52000 FROM dual
+) src
+ON (target.site_code = src.site_code)
+WHEN MATCHED THEN UPDATE SET
+  site_name = src.site_name,
+  region = src.region,
+  latitude = src.latitude,
+  longitude = src.longitude
+WHEN NOT MATCHED THEN INSERT (site_code, site_name, region, latitude, longitude)
+  VALUES (src.site_code, src.site_name, src.region, src.latitude, src.longitude);
+
+MERGE INTO species target
+USING (
+  SELECT 'ORCA' species_code, 'Orca' common_name, 'Orcinus orca' scientific_name, 'PROTECTED' conservation_status FROM dual
+  UNION ALL
+  SELECT 'BALD-EAGLE', 'Bald eagle', 'Haliaeetus leucocephalus', 'PROTECTED' FROM dual
+  UNION ALL
+  SELECT 'RIVER-OTTER', 'North American river otter', 'Lontra canadensis', 'WATCH' FROM dual
+) src
+ON (target.species_code = src.species_code)
+WHEN MATCHED THEN UPDATE SET
+  common_name = src.common_name,
+  scientific_name = src.scientific_name,
+  conservation_status = src.conservation_status
+WHEN NOT MATCHED THEN INSERT (species_code, common_name, scientific_name, conservation_status)
+  VALUES (src.species_code, src.common_name, src.scientific_name, src.conservation_status);
+
+MERGE INTO sightings target
+USING (
+  SELECT
+    'OBS-' || TO_CHAR(seq.n + 3, 'FM0000') sighting_code,
+    (SELECT site_id FROM sites WHERE site_code = CASE MOD(seq.n - 1, 6)
+      WHEN 0 THEN 'COAST-01' WHEN 1 THEN 'FOREST-02' WHEN 2 THEN 'WETLAND-03'
+      WHEN 3 THEN 'COAST-04' WHEN 4 THEN 'FOREST-05' ELSE 'WETLAND-06' END) site_id,
+    (SELECT species_id FROM species WHERE species_code = CASE MOD(seq.n - 1, 6)
+      WHEN 0 THEN 'SEA-STAR' WHEN 1 THEN 'GREAT-BLUE' WHEN 2 THEN 'SALMON'
+      WHEN 3 THEN 'ORCA' WHEN 4 THEN 'BALD-EAGLE' ELSE 'RIVER-OTTER' END) species_id,
+    TIMESTAMP '2025-05-14 07:00:00' + seq.n observed_at,
+    MOD(seq.n * 7, 18) + 1 individual_count,
+    CASE MOD(seq.n - 1, 4)
+      WHEN 0 THEN 'SHORELINE_SURVEY' WHEN 1 THEN 'POINT_COUNT'
+      WHEN 2 THEN 'CAMERA_TRAP' ELSE 'STREAM_SURVEY'
+    END observation_method,
+    CASE MOD(seq.n - 1, 6)
+      WHEN 0 THEN 'Foraging activity recorded near the waterline.'
+      WHEN 1 THEN 'Individuals observed during the morning survey.'
+      WHEN 2 THEN 'Tracks and fresh sign documented at the site.'
+      WHEN 3 THEN 'Group moving through the outer channel.'
+      WHEN 4 THEN 'Repeated calls heard from the forest edge.'
+      ELSE 'Juveniles observed in the sheltered habitat.'
+    END field_note
+  FROM (SELECT LEVEL n FROM dual CONNECT BY LEVEL <= 37) seq
+) src
+ON (target.sighting_code = src.sighting_code)
+WHEN MATCHED THEN UPDATE SET
+  site_id = src.site_id,
+  species_id = src.species_id,
+  observed_at = src.observed_at,
+  individual_count = src.individual_count,
+  observation_method = src.observation_method,
+  field_note = src.field_note
+WHEN NOT MATCHED THEN INSERT
+  (sighting_code, site_id, species_id, observed_at, individual_count, observation_method, field_note)
+  VALUES
+  (src.sighting_code, src.site_id, src.species_id, src.observed_at, src.individual_count, src.observation_method, src.field_note);
+
 CREATE OR REPLACE VIEW site_sighting_summary AS
 SELECT
   site.site_code,

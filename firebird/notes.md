@@ -1,6 +1,6 @@
 # Firebird relational database
 
-This group runs Firebird with the official Firebird 5 `employee.fdb` sample and the DbGate web client. Start with `docker compose up -d`; on the first start, Firebird installs the sample into its data volume before serving connections. Stop while retaining state with `docker compose stop`, or remove containers with `docker compose down`. Add `-v` to delete the database and client settings; add `--rmi all` to remove images (`docker compose down --rmi all -v` resets everything).
+This group runs Firebird with the official Firebird 5 `employee.fdb` sample and the CloudBeaver Community web client. Start with `docker compose up -d`; on the first start, Firebird installs the sample into its data volume before serving connections. Stop while retaining state with `docker compose stop`, or remove containers with `docker compose down`. Add `-v` to delete the database and client settings; add `--rmi all` to remove images (`docker compose down --rmi all -v` resets everything).
 
 The initializer runs only with an empty Firebird data directory. If you previously started this group with the `field-notes.fdb` database, use `docker compose down -v` to clear the old data volume before starting the updated stack.
 
@@ -13,10 +13,9 @@ Firebird is a compact relational database server. It installs the version-matche
 - Isolated example: `docker run -d --name firebird -p 127.0.0.1:3050:3050 -e FIREBIRD_ROOT_PASSWORD='FirebirdAdm1n!' -e FIREBIRD_DATABASE=employee.fdb -e FIREBIRD_DATABASE_DEFAULT_CHARSET=UTF8 -v firebird_data:/var/lib/firebird/data -v "$PWD/scripts:/docker-entrypoint-initdb.d:ro" -v "$PWD/samples/employee.fdb:/samples/employee.fdb:ro" firebirdsql/firebird:5.0.4`
 - Options: persistent database volume `firebird_data:/var/lib/firebird/data`; read-only initialization scripts and sample mounts; `FIREBIRD_ROOT_PASSWORD`, `FIREBIRD_DATABASE`, `FIREBIRD_DATABASE_DEFAULT_CHARSET`; port `3050`. The official entrypoint runs initialization files only when the data directory is empty.
 
-## DbGate
+## CloudBeaver Community
 
-DbGate is a web client for managing databases. It is preconfigured for this Firebird database and is available at `http://127.0.0.1:3102`.
+CloudBeaver is a web database client using DBeaver's JDBC drivers. It is available at `http://127.0.0.1:3102`. On first launch, complete the administrator setup. A preconfigured `Firebird Employee` connection points to the Firebird service; enter `SYSDBA` and the `FIREBIRD_ROOT_PASSWORD` value when connecting.
 
-- [Project and docs](https://dbgate.org/) · [Docker docs](https://docs.dbgate.io/installation/docker/) · [Docker Hub](https://hub.docker.com/r/dbgate/dbgate) · [GitHub](https://github.com/dbgate/dbgate)
-- Isolated example: `docker run -d --name dbgate-firebird --network firebird_default -p 127.0.0.1:3102:3000 -e CONNECTIONS=firebird -e SERVER_firebird=firebird -e PORT_firebird=3050 -e DATABASE_firebird=/var/lib/firebird/data/employee.fdb -e USER_firebird=SYSDBA -e PASSWORD_firebird='FirebirdAdm1n!' -e ENGINE_firebird=firebird@dbgate-plugin-firebird -v dbgate_firebird_data:/root/.dbgate dbgate/dbgate:latest`
-- Options: settings volume `dbgate_firebird_data:/root/.dbgate`; port `3000`; connection variables `CONNECTIONS`, `SERVER_firebird`, `PORT_firebird`, `DATABASE_firebird`, `USER_firebird`, `PASSWORD_firebird`, `ENGINE_firebird`. Requires Firebird on the same Docker network.
+- [CloudBeaver docs](https://dbeaver.com/docs/cloudbeaver/) · [Docker image](https://hub.docker.com/r/dbeaver/cloudbeaver) · [Supported databases](https://dbeaver.com/docs/cloudbeaver/Supported-databases/)
+- Workspace volume: `cloudbeaver_firebird_data:/opt/cloudbeaver/workspace`; datasource definition: `cloudbeaver/data-sources.json`; host port `3102` maps to CloudBeaver port `8978`. The Firebird Jaybird driver is included. Credentials are requested at connection time and are not stored in the datasource file.

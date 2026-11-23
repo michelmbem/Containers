@@ -22,27 +22,19 @@ services:
       retries: 12
       start_period: 30s
 
-  dbgate-firebird:
-    image: dbgate/dbgate:latest
-    container_name: dbgate-firebird
+  cloudbeaver-firebird:
+    image: dbeaver/cloudbeaver:latest
+    container_name: cloudbeaver-firebird
     restart: unless-stopped
     depends_on:
       firebird:
         condition: service_healthy
     ports:
-      - "127.0.0.1:3102:3000"
+      - "127.0.0.1:3102:8978"
     volumes:
-      - dbgate_firebird_data:/root/.dbgate
-    environment:
-      CONNECTIONS: firebird
-      LABEL_firebird: Firebird
-      SERVER_firebird: firebird
-      PORT_firebird: 3050
-      DATABASE_firebird: /var/lib/firebird/data/employee.fdb
-      USER_firebird: SYSDBA
-      PASSWORD_firebird: "${FIREBIRD_ROOT_PASSWORD:-FirebirdAdm1n!}"
-      ENGINE_firebird: firebird@dbgate-plugin-firebird
+      - cloudbeaver_firebird_data:/opt/cloudbeaver/workspace
+      - ./cloudbeaver/data-sources.json:/opt/cloudbeaver/workspace/GlobalConfiguration/.dbeaver/data-sources.json
 
 volumes:
   firebird_data:
-  dbgate_firebird_data:
+  cloudbeaver_firebird_data:

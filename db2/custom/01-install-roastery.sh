@@ -8,11 +8,6 @@ if [[ -f "$MARKER" ]]; then
   exit 0
 fi
 
-if [[ -z "${DB2INST1_PASSWORD:-}" ]]; then
-  echo "DB2INST1_PASSWORD is required." >&2
-  exit 1
-fi
-
-su -p db2inst1 -c 'bash /scripts/install-roastery-as-instance-user.sh'
+su -p db2inst1 -c 'source /home/db2inst1/sqllib/db2profile && db2 connect to ROASTERY && db2 -stvf /scripts/01-roastery.sql && db2 connect reset'
 touch "$MARKER"
 echo "ROASTERY sample database installed."

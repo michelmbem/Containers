@@ -1,25 +1,25 @@
 services:
   mongodb:
-    image: mongodb/mongodb-community-server:8.0-ubi8-slim
+    image: mongodb/mongodb-community-server:7.0-ubi8-slim
     container_name: mongodb
     restart: unless-stopped
     ports:
       - "127.0.0.1:27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-admin}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-mongoadm}
+      MONGODB_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-admin}
+      MONGODB_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-mongoadm}
     volumes:
       - mongodb_data:/data/db
       - mongodb_config:/data/configdb
     healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet --username \"$$MONGO_INITDB_ROOT_USERNAME\" --password \"$$MONGO_INITDB_ROOT_PASSWORD\" --authenticationDatabase admin --eval \"quit(db.adminCommand({ ping: 1 }).ok ? 0 : 1)\""]
+      test: ["CMD-SHELL", "mongosh --quiet --username \"$$MONGODB_INITDB_ROOT_USERNAME\" --password \"$$MONGODB_INITDB_ROOT_PASSWORD\" --authenticationDatabase admin --eval \"quit(db.adminCommand({ ping: 1 }).ok ? 0 : 1)\""]
       interval: 10s
       timeout: 5s
       retries: 12
       start_period: 30s
 
   install-got:
-    image: mongodb/mongodb-community-server:8.0-ubi8-slim
+    image: mongodb/mongodb-community-server:7.0-ubi8-slim
     restart: "no"
     depends_on:
       mongodb:

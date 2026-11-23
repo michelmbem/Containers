@@ -1,0 +1,21 @@
+{
+  "folders": {},
+  "connections": {
+    "db2-roastery": {
+      "provider": "db2",
+      "driver": "db2",
+      "name": "Db2 ROASTERY",
+      "description": "IBM Db2 Community ROASTERY database",
+      "save-password": false,
+      "read-only": false,
+      "configuration": {
+        "host": "db2",
+        "port": "50000",
+        "database": "ROASTERY",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "auth-model": "native"
+      }
+    }
+  }
+}

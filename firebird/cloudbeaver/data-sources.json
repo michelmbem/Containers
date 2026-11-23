@@ -1,0 +1,21 @@
+{
+  "folders": {},
+  "connections": {
+    "firebird-employee": {
+      "provider": "jaybird",
+      "driver": "jaybird",
+      "name": "Firebird Employee",
+      "description": "Firebird 5 employee sample database",
+      "save-password": false,
+      "read-only": false,
+      "configuration": {
+        "host": "firebird",
+        "port": "3050",
+        "database": "/var/lib/firebird/data/employee.fdb",
+        "configurationType": "MANUAL",
+        "type": "dev",
+        "auth-model": "native"
+      }
+    }
+  }
+}
